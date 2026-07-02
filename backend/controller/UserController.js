@@ -118,4 +118,13 @@ export const resetPassword = async (req, res, next) => {
   if (!user) {
     return next(new HandleError("Invalid or expired reset token", 400));
   }
+  const { password, confirmPassword } = req.body;
+  if (!password || !confirmPassword) {
+    return next(new HandleError("Password fields cannot be empty", 400));
+  }
+  user.password = password;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExprire = undefined;
+  await user.save();
+  sendToken(user, 200, res);
 };
