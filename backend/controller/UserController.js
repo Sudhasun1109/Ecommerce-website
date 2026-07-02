@@ -2,6 +2,7 @@ import HandleError from "../Helper/handleError.js";
 import { sendToken } from "../Helper/jwttoken.js";
 import { sendEmail } from "../Helper/sendEmail.js";
 import User from "../models/userModal.js";
+import crypto from "crypto";
 
 export const registerUser = async (req, res, next) => {
   const { name, email, password } = req.body;
@@ -62,7 +63,7 @@ export const logout = async (req, res, next) => {
 
 //Reset Password
 
-export const resetPassword = async (req, res, next) => {
+export const forgetPassword = async (req, res, next) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
   if (!user) {
@@ -97,8 +98,24 @@ export const resetPassword = async (req, res, next) => {
     console.log(error);
     user.resetPasswordToken = undefined;
     user.resetPasswordExprire = undefined;
+    await user.save({ validateBeforeSave: false });
     return next(
       new HandleError("Email could not be send try again leter..", 500),
     );
+  }
+};
+
+export const resetPassword = async (req, res, next) => {
+  const resetToken = req.params.token;
+  const resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+  const user = await User.findOne({
+    resetPasswordToken,
+    resetPasswordExprire: { $gt: Date.now() },
+  });
+  if (!user) {
+    return next(new HandleError("Invalid or expired reset token", 400));
   }
 };
