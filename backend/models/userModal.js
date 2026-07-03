@@ -42,7 +42,7 @@ const userschema = new mongoose.Schema(
       default: "user",
     },
     resetPasswordToken: String,
-    resetPasswordExprire: Date,
+    resetPasswordExpire: Date,
   },
   { timestamps: true },
 );
@@ -69,7 +69,7 @@ userschema.methods.createPasswordResetToken = function () {
     .createHash("sha256")
     .update(resetToken)
     .digest("hex");
-  this.resetPasswordExprire = Date.now() + 30 * 60 * 1000;
+  this.resetPasswordExpire = Date.now() + 30 * 60 * 1000;
   return resetToken;
 };
 

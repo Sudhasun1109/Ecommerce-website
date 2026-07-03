@@ -46,6 +46,12 @@ const productSchema = new mongoose.Schema({
   },
   review: [
     {
+      user: {
+        type: mongoose.Schema.ObjectId,
+        // this ref is usermodals export name
+        ref: "User",
+        required: true,
+      },
       name: { type: String, required: true },
       rating: { type: Number, required: true },
       comment: { type: String, required: true },
