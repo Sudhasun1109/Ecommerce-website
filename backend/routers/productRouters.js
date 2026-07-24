@@ -7,6 +7,8 @@ import {
   updateproduct,
   createProductReview,
   viewProductReviews,
+  getallproductsbyadmin,
+  adminDeleteReview,
 } from "../controller/ProductController.js";
 import { rolebasedAccess, verifyUser } from "../Helper/UserAuth.js";
 
@@ -27,8 +29,12 @@ router
   .delete(verifyUser, rolebasedAccess("admin"), deleteproduct);
 router
   .route("/admin/review")
-  .get(verifyUser, rolebasedAccess("admin"), viewProductReviews);
+  .get(verifyUser, rolebasedAccess("admin"), viewProductReviews).delete(verifyUser, rolebasedAccess("admin"), adminDeleteReview);
 //admin can see all products
+router
+  .route("/admin/products")
+  .get(verifyUser, rolebasedAccess("admin"), getallproductsbyadmin);
 //delete reviews for admin
+
 
 export default router;

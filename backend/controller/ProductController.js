@@ -40,7 +40,7 @@ export const updateproduct = async (req, res, next) => {
   });
 };
 //delete the products
-export const deleteproduct = async (req, res) => {
+export const deleteproduct = async (req, res, next) => {
   const id = req.params.id;
   let product = await Product.findByIdAndDelete(id);
 
@@ -93,6 +93,7 @@ export const getsingleProduct = async (req, res, next) => {
   });
 };
 
+// Add reviews
 export const createProductReview = async (req, res, next) => {
   const { rating, comment, productId } = req.body;
 
@@ -142,7 +143,7 @@ export const createProductReview = async (req, res, next) => {
     product,
   });
 };
-
+// view reviw for product
 export const viewProductReviews = async (req, res, next) => {
   const productId = await Product.findById(req.query.id);
   if (!productId) {
@@ -153,3 +154,36 @@ export const viewProductReviews = async (req, res, next) => {
     reviews: productId.review,
   });
 };
+//Admin view all product
+
+export const getallproductsbyadmin = async (req,res)=>{
+  const products = await Product.find();
+  res.status(200).json({
+    success: true,
+    products,
+  });
+}
+//Delete review for admin
+export const adminDeleteReview = async (req,res,next) =>{
+  const product =await Product.findById(req.query.productId); //product id is coming from query
+  if(!product){
+    return next(new errorHandler("Product not found", 400));
+  }
+  const reviews =product.reviews.filter((review => review._id.toString() !== req.query.id.toString()));
+  
+  let sum = 0;
+  reviews.forEach((review) => {
+    sum += review.rating;
+  });
+  const rating = reviews.length > 0 ? sum / reviews.length : 0;
+  const numOfReviews = reviews.length;
+  await Product.findByIdAndUpdate(req.query.productId,{
+    reviews,
+    numOfReviews,
+    rating,
+  },{new:true,runValidators:true});
+res.status(200).json({
+  success:true,
+  message:"Review deleted successfully",
+});
+}

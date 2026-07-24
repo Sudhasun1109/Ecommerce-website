@@ -11,4 +11,4 @@ export const sendToken = (user, statuscode, res) => {
     user,
     token,
   });
-};
+};  
